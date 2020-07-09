@@ -13,10 +13,11 @@ namespace 自动处理程序
     {
         static System.Timers.Timer imageTimer = new System.Timers.Timer();
         static System.Timers.Timer DnsTimer = new System.Timers.Timer();
+        static System.Timers.Timer phpTimer = new System.Timers.Timer();
         static string dirPath;//qq机器人图片库文件夹
         static List<string> imagePathList = new List<string>();
         static List<string> imageList = new List<string>();
-
+        static string phpcmd;//php合并文件命令
         static string apiUrl = "";
         static string imageUrl = "";
         static long jishu = 0;
@@ -26,6 +27,7 @@ namespace 自动处理程序
             windowsStart();
             //iamgeTimerStart();
             //dnsTimerStart();
+            cmdTimerStart();
             Console.ReadLine();
         }
 
@@ -38,9 +40,11 @@ namespace 自动处理程序
             //ReadImagePath("./imagedirpath.txt");
             //ReadDNSAPI("./dnsapi.txt");
             //ReadImageUrl("./imageurl.txt");
-            cmd();
+            ReadPHPMergeFile("./phpcmd.txt");
         }
-
+        /// <summary>
+        /// 图片定时器
+        /// </summary>
         private static void iamgeTimerStart()
         {
             imageTimer.Elapsed += new ElapsedEventHandler(imageTimerF);
@@ -49,6 +53,9 @@ namespace 自动处理程序
             imageTimer.Enabled = true;
             Console.WriteLine("图片服务启动成功");
         }
+        /// <summary>
+        /// 动态ip解析定时器
+        /// </summary>
 
         private static void dnsTimerStart()
         {
@@ -58,37 +65,36 @@ namespace 自动处理程序
             DnsTimer.Enabled = true;
             Console.WriteLine("动态域名解析服务启动成功");
         }
-
-        private static void cmd()
+        /// <summary>
+        /// php命令行定时器
+        /// </summary>
+        private static void cmdTimerStart()
         {
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
-            p.StartInfo.FileName = "cmd.exe";
-            p.StartInfo.UseShellExecute = false;    //是否使用操作系统shell启动
-            p.StartInfo.RedirectStandardInput = true;//接受来自调用程序的输入信息
-            p.StartInfo.RedirectStandardOutput = true;//由调用程序获取输出信息
-            p.StartInfo.RedirectStandardError = true;//重定向标准错误输出
-            p.StartInfo.CreateNoWindow = true;//不显示程序窗口
-            p.Start();//启动程序
-            string str = "ipconfig";
-            p.StandardInput.WriteLine(str + "&exit");
-            p.StandardInput.AutoFlush = true;
-            //p.StandardInput.WriteLine("exit");
-            //向标准输入写入要执行的命令。这里使用&是批处理命令的符号，表示前面一个命令不管是否执行成功都执行后面(exit)命令，如果不执行exit命令，后面调用ReadToEnd()方法会假死
-            //同类的符号还有&&和||前者表示必须前一个命令执行成功才会执行后面的命令，后者表示必须前一个命令执行失败才会执行后面的命令
+            phpTimer.Elapsed += new ElapsedEventHandler(cmdTimerF);
+            // 设置引发时间的时间间隔 此处设置为１秒（１０００毫秒）
+            phpTimer.Interval = 1000;
+            phpTimer.Enabled = true;
+            Console.WriteLine("php命令行合并文件服务启动成功");
 
-
-
-            //获取cmd窗口的输出信息
-            string output = p.StandardOutput.ReadToEnd();
-            p.WaitForExit();//等待程序执行完退出进程
-            p.Close();
-            Console.WriteLine(output);
+            
         }
 
         #region 读取配置文件
 
 
+        public static void ReadPHPMergeFile(string path) {
+            try
+            {
+                StreamReader sr = new StreamReader(path, Encoding.Default);
+                phpcmd = sr.ReadLine();
+                Console.WriteLine("已成功配置php命令行执行地址");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("未找到phpcmd.txt配置文件");
+            }
 
+        }
         /// <summary>
         /// 读取机器人图片文件夹地址
         /// </summary>
@@ -175,6 +181,48 @@ namespace 自动处理程序
         #endregion
 
         #region 定时器
+
+
+        private static void cmdTimerF(object source, ElapsedEventArgs e)
+        {
+
+            try
+            {
+                phpTimer.Enabled = false;
+                System.Diagnostics.Process p = new System.Diagnostics.Process();
+                p.StartInfo.FileName = "cmd.exe";
+                p.StartInfo.UseShellExecute = false;    //是否使用操作系统shell启动
+                p.StartInfo.RedirectStandardInput = true;//接受来自调用程序的输入信息
+                p.StartInfo.RedirectStandardOutput = true;//由调用程序获取输出信息
+                p.StartInfo.RedirectStandardError = true;//重定向标准错误输出
+                p.StartInfo.CreateNoWindow = true;//不显示程序窗口
+                p.Start();//启动程序
+                string str = phpcmd;
+                p.StandardInput.WriteLine(str + "&exit");
+                p.StandardInput.AutoFlush = true;
+                //p.StandardInput.WriteLine("exit");
+                //向标准输入写入要执行的命令。这里使用&是批处理命令的符号，表示前面一个命令不管是否执行成功都执行后面(exit)命令，如果不执行exit命令，后面调用ReadToEnd()方法会假死
+                //同类的符号还有&&和||前者表示必须前一个命令执行成功才会执行后面的命令，后者表示必须前一个命令执行失败才会执行后面的命令
+
+                //获取cmd窗口的输出信息
+                string output = p.StandardOutput.ReadToEnd();
+                p.WaitForExit();//等待程序执行完退出进程
+                p.Close();
+                Console.WriteLine(output);
+                phpTimer.Enabled = true;
+            }
+            catch(Exception ex)
+            {
+                phpTimer.Enabled = true;
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("########################################php合并文件命令异常########################################");
+            }
+
+           
+        }
+
+
+
 
         /// <summary>
         /// 动态解析ip定时器
