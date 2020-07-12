@@ -25,8 +25,8 @@ namespace 自动处理程序
         {
 
             windowsStart();
-            //iamgeTimerStart();
-            //dnsTimerStart();
+            iamgeTimerStart();
+            dnsTimerStart();
             cmdTimerStart();
             Console.ReadLine();
         }
