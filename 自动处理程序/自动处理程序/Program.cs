@@ -36,10 +36,10 @@ namespace 自动处理程序
         /// </summary>
         private static void windowsStart()
         {
-            //ReadDirPath("./dirpath.txt");
-            //ReadImagePath("./imagedirpath.txt");
-            //ReadDNSAPI("./dnsapi.txt");
-            //ReadImageUrl("./imageurl.txt");
+            ReadDirPath("./dirpath.txt");
+            ReadImagePath("./imagedirpath.txt");
+            ReadDNSAPI("./dnsapi.txt");
+            ReadImageUrl("./imageurl.txt");
             ReadPHPMergeFile("./phpcmd.txt");
         }
         /// <summary>
