@@ -18,6 +18,7 @@ namespace 自动处理程序
         static List<string> imagePathList = new List<string>();
         static List<string> imageList = new List<string>();
         static string phpcmd;//php合并文件命令
+        static string createphpcmd;
         static string apiUrl = "";
         static string imageUrl = "";
         static long jishu = 0;
@@ -87,6 +88,7 @@ namespace 自动处理程序
             {
                 StreamReader sr = new StreamReader(path, Encoding.Default);
                 phpcmd = sr.ReadLine();
+                createphpcmd = sr.ReadLine();
                 Console.WriteLine("已成功配置php命令行执行地址");
             }
             catch (Exception e)
@@ -206,6 +208,20 @@ namespace 自动处理程序
 
                 //获取cmd窗口的输出信息
                 string output = p.StandardOutput.ReadToEnd();
+                p.WaitForExit();//等待程序执行完退出进程
+                p.Close();
+                Console.WriteLine(output);
+                //执行合并文件命令
+                p.Start();
+                str = createphpcmd;
+                p.StandardInput.WriteLine(str + "&exit");
+                p.StandardInput.AutoFlush = true;
+                //p.StandardInput.WriteLine("exit");
+                //向标准输入写入要执行的命令。这里使用&是批处理命令的符号，表示前面一个命令不管是否执行成功都执行后面(exit)命令，如果不执行exit命令，后面调用ReadToEnd()方法会假死
+                //同类的符号还有&&和||前者表示必须前一个命令执行成功才会执行后面的命令，后者表示必须前一个命令执行失败才会执行后面的命令
+
+                //获取cmd窗口的输出信息
+                output = p.StandardOutput.ReadToEnd();
                 p.WaitForExit();//等待程序执行完退出进程
                 p.Close();
                 Console.WriteLine(output);
