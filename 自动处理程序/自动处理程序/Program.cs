@@ -26,9 +26,9 @@ namespace 自动处理程序
         {
 
             windowsStart();
-            iamgeTimerStart();
+            //iamgeTimerStart();
             dnsTimerStart();
-            cmdTimerStart();
+            //cmdTimerStart();
             Console.ReadLine();
         }
 
@@ -37,11 +37,11 @@ namespace 自动处理程序
         /// </summary>
         private static void windowsStart()
         {
-            ReadDirPath("./dirpath.txt");
-            ReadImagePath("./imagedirpath.txt");
+            //ReadDirPath("./dirpath.txt");
+            //ReadImagePath("./imagedirpath.txt");
             ReadDNSAPI("./dnsapi.txt");
-            ReadImageUrl("./imageurl.txt");
-            ReadPHPMergeFile("./phpcmd.txt");
+            //ReadImageUrl("./imageurl.txt");
+            //ReadPHPMergeFile("./phpcmd.txt");
         }
         /// <summary>
         /// 图片定时器
